@@ -1,51 +1,31 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mountain, Eye, EyeOff, Shield, ChevronRight, Loader2 } from 'lucide-react';
+import { Mountain, Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
 
-const QUICK_ACCESS_ROLES = [
-  { role: 'admin', label: 'Admin', desc: 'Full platform access' },
-  { role: 'mine_operator', label: 'Mine Operator', desc: 'Mine operations' },
-  { role: 'inspector', label: 'Inspector', desc: 'Field inspections' },
-  { role: 'analyst', label: 'Analyst', desc: 'Analytics & oversight' },
-  { role: 'viewer', label: 'Viewer', desc: 'Read-only access' },
-];
-
-export default function LoginPage() {
-  const { login, demoLogin } = useAuth();
+export default function SignupPage() {
+  const { register } = useAuth();
   const navigate = useNavigate();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) { setError('Please enter email and password'); return; }
+    if (!name || !email || !password) { setError('Please fill in all fields'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await register(name, email, password);
       navigate('/app');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid credentials. Try a demo account.');
+      setError(err.response?.data?.detail || 'Failed to register. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async (role: string) => {
-    setError('');
-    setDemoLoading(role);
-    try {
-      await demoLogin(role);
-      navigate('/app');
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Demo login failed. Ensure backend is running.');
-    } finally {
-      setDemoLoading(null);
     }
   };
 
@@ -77,27 +57,12 @@ export default function LoginPage() {
 
         <div className="relative z-10 max-w-lg">
           <h2 className="text-3xl font-bold text-white leading-snug mb-4">
-            Intelligent Governance for<br />
-            <span className="text-amber-brand">Safer, Smarter Mining</span>
+            Join KhanijSetu for<br />
+            <span className="text-amber-brand">Transparency & Safety</span>
           </h2>
           <p className="text-gray-400 text-[15px] leading-relaxed mb-8">
-            An integrated digital governance platform for compliance monitoring, safety intelligence,
-            field operations and risk management across coal mining operations in India.
+            Create an account to view and access public compliance data, safety records, and general insights into Indian coal mining operations.
           </p>
-
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { n: 'Real-Time', l: 'Compliance Monitoring' },
-              { n: 'AI-Driven', l: 'Risk Analysis' },
-              { n: '24/7', l: 'Safety Intelligence' },
-              { n: '5', l: 'Role-Based Views' },
-            ].map((s, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-                <p className="text-2xl font-bold text-white">{s.n}</p>
-                <p className="text-xs text-gray-500">{s.l}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="relative z-10 flex items-center gap-2 text-xs text-gray-600">
@@ -106,7 +71,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Panel — Login Form */}
+      {/* Right Panel — Signup Form */}
       <div className="flex-1 flex items-center justify-center p-6 bg-white">
         <div className="w-full max-w-md">
           {/* Mobile brand */}
@@ -117,8 +82,8 @@ export default function LoginPage() {
             <span className="text-lg font-bold text-charcoal">KhanijSetu</span>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">Sign in to your account</h2>
-          <p className="text-sm text-gray-500 mb-8">Access the mining governance platform</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">Create an account</h2>
+          <p className="text-sm text-gray-500 mb-8">Sign up for viewer access to the platform</p>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
@@ -126,14 +91,24 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ramesh Kumar"
+                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/20 transition-all"
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@khanijsetu.gov.in"
+                placeholder="user@example.com"
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/20 transition-all"
               />
             </div>
@@ -155,37 +130,28 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300 text-amber-brand focus:ring-amber-brand/30" />
-                <span className="text-gray-600">Remember me</span>
-              </label>
-              <button type="button" className="text-amber-brand hover:text-amber-hover font-medium">
-                Forgot password?
-              </button>
+              <p className="mt-1.5 text-xs text-gray-500">Must be at least 6 characters.</p>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-brand hover:bg-amber-hover text-charcoal font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full bg-amber-brand hover:bg-amber-hover text-charcoal font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 mt-6"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Sign In
+              Sign Up
             </button>
           </form>
 
-          {/* Sign Up Link */}
+          {/* Login Link */}
           <div className="mt-8 text-center text-sm">
-            <span className="text-gray-500">Don't have an account? </span>
+            <span className="text-gray-500">Already have an account? </span>
             <button
               type="button"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login')}
               className="text-amber-brand hover:text-amber-hover font-semibold transition-colors"
             >
-              Request Access
+              Sign In
             </button>
           </div>
         </div>

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
-from app.auth.jwt_handler import verify_password, create_access_token, get_current_user
+from app.auth.jwt_handler import verify_password, get_password_hash, create_access_token, get_current_user
 from app.auth.rbac import get_user_accessible_modules
-from app.schemas.auth import LoginRequest, DemoLoginRequest, TokenResponse, UserResponse
+from app.schemas.auth import LoginRequest, DemoLoginRequest, RegisterRequest, TokenResponse, UserResponse
 from app.models.audit import AuditLog
 from datetime import datetime, timezone
 
@@ -97,3 +97,46 @@ async def get_me(current_user: User = Depends(get_current_user)):
         is_active=current_user.is_active, avatar_url=current_user.avatar_url or "",
         accessible_modules=modules
     )
+
+
+@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+async def register(request: RegisterRequest, db: Session = Depends(get_db)):
+    """Public self-registration — creates a viewer-only account."""
+    # Check email uniqueness
+    existing = db.query(User).filter(User.email == request.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="An account with this email already exists.")
+
+    if len(request.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+
+    new_user = User(
+        email=request.email,
+        name=request.name,
+        password_hash=get_password_hash(request.password),
+        role="viewer",
+        designation="Registered User",
+        is_active=True,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    token = create_access_token(data={"sub": str(new_user.id), "role": new_user.role})
+    db.add(AuditLog(
+        user_id=new_user.id, user_name=new_user.name, user_role=new_user.role,
+        action="register", module="auth", entity="user", entity_id=new_user.id,
+        details=f"New viewer registered: {new_user.email}", status="success"
+    ))
+    db.commit()
+
+    modules = get_user_accessible_modules(new_user.role)
+    user_response = UserResponse(
+        id=new_user.id, email=new_user.email, name=new_user.name,
+        role=new_user.role, designation=new_user.designation or "",
+        phone="", subsidiary_id=None, mine_id=None,
+        is_active=new_user.is_active, avatar_url="",
+        accessible_modules=modules
+    )
+    return TokenResponse(access_token=token, user=user_response)
+

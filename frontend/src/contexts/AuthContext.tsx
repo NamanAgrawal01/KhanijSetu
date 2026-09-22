@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   demoLogin: (role: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   hasModule: (module: string) => boolean;
 }
@@ -53,6 +54,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   }, []);
 
+  const register = useCallback(async (name: string, email: string, password: string) => {
+    const res = await api.post<TokenResponse>('/auth/register', { name, email, password });
+    const { access_token, user: userData } = res.data;
+    localStorage.setItem('khanijsetu_token', access_token);
+    localStorage.setItem('khanijsetu_user', JSON.stringify(userData));
+    setToken(access_token);
+    setUser(userData);
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('khanijsetu_token');
     localStorage.removeItem('khanijsetu_user');
@@ -75,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         demoLogin,
+        register,
         logout,
         hasModule,
       }}
