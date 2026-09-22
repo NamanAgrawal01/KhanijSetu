@@ -68,21 +68,21 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Governance Overview</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Governance Overview</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             Real-time compliance, safety and operational intelligence across mining operations.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 text-sm text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50">
+        <div className="flex flex-wrap items-center gap-2">
+          <button className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 bg-white border border-gray-200 px-3 py-2 rounded-lg hover:bg-gray-50">
             <Calendar className="w-4 h-4" /> Last 30 days
           </button>
-          <button onClick={fetchDashboard} className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+          <button onClick={fetchDashboard} className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 flex-shrink-0">
             <RefreshCw className="w-4 h-4 text-gray-600" />
           </button>
-          <button className="flex items-center gap-1.5 text-sm text-white bg-amber-brand hover:bg-amber-hover px-3 py-1.5 rounded-lg font-medium">
+          <button className="flex items-center gap-1.5 text-xs sm:text-sm text-white bg-amber-brand hover:bg-amber-hover px-3 py-2 rounded-lg font-medium">
             <Download className="w-4 h-4" /> Export
           </button>
         </div>

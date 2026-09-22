@@ -169,20 +169,20 @@ export default function DashboardLayout() {
         {/* Top Header */}
         <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 shrink-0">
           <div className="flex items-center gap-3">
-            {/* Mobile menu */}
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100"
-            >
-              <Menu className="w-5 h-5 text-gray-600" />
-            </button>
-            {/* Sidebar toggle */}
+            {/* Desktop Sidebar toggle */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="hidden lg:block p-1.5 rounded-lg hover:bg-gray-100"
             >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
+            {/* Mobile Title (when sidebar hidden) */}
+            <div className="lg:hidden flex items-center gap-2">
+              <div className="w-7 h-7 bg-amber-brand rounded flex items-center justify-center shrink-0">
+                <Mountain className="w-4 h-4 text-charcoal" />
+              </div>
+              <span className="text-[15px] font-bold text-gray-900 tracking-tight">KhanijSetu</span>
+            </div>
             {/* Breadcrumb */}
             <div className="hidden sm:flex items-center gap-1.5 text-sm">
               <span className="text-gray-400">KhanijSetu</span>
@@ -233,10 +233,30 @@ export default function DashboardLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main className="flex-1 overflow-y-auto p-3 lg:p-6 pb-20 lg:pb-6">
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-center justify-around pb-3 pt-2 px-2 z-40 h-[68px] shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+        <NavLink to="/app" end className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full gap-1 transition-colors ${isActive ? 'text-amber-brand' : 'text-gray-500 hover:text-gray-900'}`}>
+          <LayoutDashboard className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Home</span>
+        </NavLink>
+        <NavLink to="/app/mines" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full gap-1 transition-colors ${isActive ? 'text-amber-brand' : 'text-gray-500 hover:text-gray-900'}`}>
+          <Mountain className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Mines</span>
+        </NavLink>
+        <NavLink to="/app/compliance" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full gap-1 transition-colors ${isActive ? 'text-amber-brand' : 'text-gray-500 hover:text-gray-900'}`}>
+          <ShieldCheck className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Audit</span>
+        </NavLink>
+        <button onClick={() => setMobileOpen(true)} className="flex flex-col items-center justify-center w-16 h-full gap-1 text-gray-500 hover:text-gray-900 transition-colors">
+          <Menu className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Menu</span>
+        </button>
+      </nav>
     </div>
   );
 }
