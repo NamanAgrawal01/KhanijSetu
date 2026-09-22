@@ -107,6 +107,23 @@ async def health_check():
     }
 
 
+@app.post("/api/seed")
+async def seed_database(secret: str = ""):
+    """One-time seed endpoint — populates database with demo data."""
+    expected = os.environ.get("SEED_SECRET", "khanijsetu-seed-2026")
+    if secret != expected:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Invalid seed secret")
+    try:
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
+        from seed_data import seed
+        seed()
+        return {"status": "success", "message": "Database seeded with demo data"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=True)
