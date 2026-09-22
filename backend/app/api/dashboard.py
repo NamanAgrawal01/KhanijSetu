@@ -24,16 +24,8 @@ async def get_dashboard(db: Session = Depends(get_db), current_user: User = Depe
     # Scope mines based on role. Corporate/authority/admin see cross-mine intelligence.
     if current_user.role == "mine_operator" and current_user.mine_id:
         mines = db.query(Mine).filter(Mine.id == current_user.mine_id).all()
-    elif current_user.role == "inspector":
-        mines = db.query(Mine).all()
     else:
         mines = db.query(Mine).all()
-
-    for m in mines:
-        recalculate_mine(db, m.id)
-    db.commit()
-    mines = [db.query(Mine).filter(Mine.id == m.id).first() for m in mines]
-    mines = [m for m in mines if m]
 
     mine_ids = [m.id for m in mines]
     total_mines = len(mines)
