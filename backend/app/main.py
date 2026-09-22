@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.config import settings
@@ -72,6 +73,12 @@ app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
 @app.on_event("startup")
 async def startup():
     init_db()
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    """Root redirect → API docs."""
+    return RedirectResponse(url="/api/docs")
 
 
 @app.get("/api/health")
