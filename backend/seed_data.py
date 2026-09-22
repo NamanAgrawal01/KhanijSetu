@@ -57,19 +57,19 @@ def seed():
         db.add_all(subsidiaries)
         db.flush()
 
-        # ===== USERS (10) =====
+        # ===== USERS (10) — inserted WITHOUT mine_id first to avoid circular FK ===
         demo_password = get_password_hash("demo123")
         users = [
             User(id=1, email="admin@khanijsetu.gov.in", password_hash=demo_password, name="Dr. Arun Kumar Verma", role="admin", designation="Platform Administrator", phone="+91-9876543210", subsidiary_id=None, mine_id=None),
-            User(id=2, email="operator@khanijsetu.gov.in", password_hash=demo_password, name="Shri Amit Kumar Singh", role="mine_operator", designation="Mine Operator", phone="+91-9876543211", subsidiary_id=1, mine_id=1),
+            User(id=2, email="operator@khanijsetu.gov.in", password_hash=demo_password, name="Shri Amit Kumar Singh", role="mine_operator", designation="Mine Operator", phone="+91-9876543211", subsidiary_id=1, mine_id=None),
             User(id=3, email="inspector@khanijsetu.gov.in", password_hash=demo_password, name="Shri Rajesh Kumar Sharma", role="inspector", designation="Inspector of Mines, DGMS", phone="+91-9876543212", subsidiary_id=None, mine_id=None),
             User(id=4, email="analyst@khanijsetu.gov.in", password_hash=demo_password, name="Smt. Priya Mehta", role="analyst", designation="General Manager (Compliance)", phone="+91-9876543213", subsidiary_id=1, mine_id=None),
             User(id=5, email="viewer@khanijsetu.gov.in", password_hash=demo_password, name="Shri Vinod Prasad", role="viewer", designation="Director, DGMS", phone="+91-9876543214", subsidiary_id=None, mine_id=None),
             User(id=6, email="inspector2@khanijsetu.gov.in", password_hash=demo_password, name="Shri Pankaj Verma", role="inspector", designation="Assistant Inspector of Mines", phone="+91-9876543215", subsidiary_id=None, mine_id=None),
-            User(id=7, email="operator2@khanijsetu.gov.in", password_hash=demo_password, name="Shri Deepak Pandey", role="mine_operator", designation="Mine Operator", phone="+91-9876543216", subsidiary_id=2, mine_id=3),
-            User(id=8, email="operator3@khanijsetu.gov.in", password_hash=demo_password, name="Shri Suresh Yadav", role="mine_operator", designation="Mine Operator", phone="+91-9876543217", subsidiary_id=1, mine_id=2),
+            User(id=7, email="operator2@khanijsetu.gov.in", password_hash=demo_password, name="Shri Deepak Pandey", role="mine_operator", designation="Mine Operator", phone="+91-9876543216", subsidiary_id=2, mine_id=None),
+            User(id=8, email="operator3@khanijsetu.gov.in", password_hash=demo_password, name="Shri Suresh Yadav", role="mine_operator", designation="Mine Operator", phone="+91-9876543217", subsidiary_id=1, mine_id=None),
             User(id=9, email="analyst2@khanijsetu.gov.in", password_hash=demo_password, name="Shri Ramesh Agarwal", role="analyst", designation="Chief Safety Officer", phone="+91-9876543218", subsidiary_id=2, mine_id=None),
-            User(id=10, email="operator4@khanijsetu.gov.in", password_hash=demo_password, name="Smt. Kavita Devi", role="mine_operator", designation="Mine Operator", phone="+91-9876543219", subsidiary_id=4, mine_id=10),
+            User(id=10, email="operator4@khanijsetu.gov.in", password_hash=demo_password, name="Smt. Kavita Devi", role="mine_operator", designation="Mine Operator", phone="+91-9876543219", subsidiary_id=4, mine_id=None),
         ]
         db.add_all(users)
         db.flush()
@@ -91,6 +91,14 @@ def seed():
         ]
         db.add_all(mines)
         db.flush()
+
+        # Now update users with their mine_ids (after mines exist)
+        db.query(User).filter(User.id == 2).update({"mine_id": 1})
+        db.query(User).filter(User.id == 7).update({"mine_id": 3})
+        db.query(User).filter(User.id == 8).update({"mine_id": 2})
+        db.query(User).filter(User.id == 10).update({"mine_id": 10})
+        db.flush()
+
 
         # ===== COMPLIANCE REQUIREMENTS (12) =====
         requirements = [
