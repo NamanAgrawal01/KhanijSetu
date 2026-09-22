@@ -57,3 +57,4 @@ htmlcov/
 
 # Alembic
 alembic/versions/__pycache__/
+.neon
