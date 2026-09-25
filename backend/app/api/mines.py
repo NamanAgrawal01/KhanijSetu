@@ -45,7 +45,7 @@ async def get_mines(
     district: Optional[str] = None,
     mine_type: Optional[str] = None,
     sort_by: Optional[str] = None,
-    skip: int = 0, limit: int = 50,
+    skip: int = 0, limit: int = 100,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
